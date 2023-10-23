@@ -282,7 +282,7 @@ func goType(val interface{}) string {
 	case float64:
 		s := fmt.Sprintf("%f", val)
 		s = strings.TrimRight(s, "0")
-		if s[len(s)-1] != '.' {
+		if s[len(s)-1] == '.' {
 			return "float64"
 		}
 
