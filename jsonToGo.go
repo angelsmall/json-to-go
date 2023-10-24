@@ -25,6 +25,8 @@ import (
 
 var (
 	floatReg      = regexp.MustCompile(`:(\s*\d*)\.0`)
+	floatReplace1 = regexp.MustCompile(`\d+\.\d`)
+	floatReplace2 = regexp.MustCompile(`\d+\.\d+e[+-]\d+`)
 	numReg        = regexp.MustCompile(`^\d+$`)
 	formatReg     = regexp.MustCompile(`[^A-Za-z0-9]`)
 	timeReg       = regexp.MustCompile(`\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(\+\d\d:\d\d|Z)`)
@@ -88,6 +90,8 @@ func (t *parser) reset() {
 // parse json data in string
 func (t *parser) parse(jsonData string, option Options) (string, error) {
 	data := floatReg.ReplaceAllString(jsonData, ":$1.1") // hack that forces floats to stay as floats
+	data = floatReplace1.ReplaceAllString(data, "1.1")
+	data = floatReplace2.ReplaceAllString(data, "1.1")
 	var scope interface{}
 	err := json.Unmarshal([]byte(data), &scope)
 	if err != nil {
@@ -282,7 +286,7 @@ func goType(val interface{}) string {
 	case float64:
 		s := fmt.Sprintf("%f", val)
 		s = strings.TrimRight(s, "0")
-		if s[len(s)-1] == '.' {
+		if s[len(s)-1] != '.' {
 			return "float64"
 		}
 
